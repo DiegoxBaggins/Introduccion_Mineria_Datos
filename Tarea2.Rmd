@@ -1,0 +1,30 @@
+---
+title: "Tarea2_DiegoSierra"
+output: html_notebook
+---
+
+```{r}
+install.packages("arules")
+library(arules)
+
+data <- read.csv('./data/censo_2018/PERSONA_BDP.csv', sep=",")
+
+data
+colnames(data)
+
+#quitar las columnas PEA,POCUPA y PEI porque solo tienen un dato
+data_limpia <- data[, -c(75,76,80)]
+
+reglas <- apriori(data_limpia, parameter = list(support=0.3, confidence = 0.5 ))
+
+#ordenar por la confianza de la regla
+reglas_ordenadas <- sort(reglas, by = "confidence", decreasing = TRUE)
+
+#filtrar reglas mayores a 75% suponiendo que son obvias
+reglas_filtradas <- subset(reglas_ordenadas, confidence < 0.75)
+
+
+inspect(reglas_filtradas[1500:1600])
+inspect(reglas_filtradas[0:100])
+inspect(reglas_filtradas[200:300])
+```
