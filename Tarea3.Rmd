@@ -1,0 +1,53 @@
+---
+title: "Tarea3_DiegoSierra"
+output: html_notebook
+---
+
+```{r}
+
+install.packages("dplyr")
+library(dplyr)
+
+data_migracion <- read.csv('./data/censo_2018/MIGRACION_BDP.csv', sep=",")
+colnames(data_migracion)
+#retiro las columnas que no son relevantes para los análisis
+data_migracion <- data_migracion %>% select(-c(COD_MUNICIPIO, NUM_VIVIENDA, NUM_HOGAR, ID_EMIGRACION))
+data_migracion <- data_migracion %>% filter(PEI5 != 9999)
+
+
+#para el primer analisis es del comportamiento de los emigrantes varones del departamento de guatemala en area urbana
+data1 <- data_migracion %>% filter(DEPARTAMENTO == 1 & PEI3 == 1 & AREA == 1)
+data1 <- data1 %>% select(-c(DEPARTAMENTO, AREA, PEI3))
+colnames(data1)
+
+reglas1 <- fim4r(data1, method = "fpgrowth", target="rules", supp = .2, conf = .3)
+reglas1frame <- as(reglas1, "data.frame")
+reglas1ordenadas <- arrange(reglas1frame, desc(confidence))
+reglas1filtradas <- subset(reglas1ordenadas, confidence < 0.90)
+
+
+
+#para el segundo analisis es del comportamiento de los emigrantes del área del altiplano Guatemalteco
+data2 <- data_migracion %>% filter(DEPARTAMENTO %in% c(4,7,8,9,12,13,14) & AREA == 2)
+data2 <- data2 %>% select(-c(AREA, ZONA))
+colnames(data2)
+sort(unique(data_migracion$PEI5), decreasing=TRUE)
+
+reglas2 <- fim4r(data2, method = "fpgrowth", target="rules", supp = .2, conf = .4)
+reglas2frame <- as(reglas2, "data.frame")
+reglas2ordenadas <- arrange(reglas2frame, desc(confidence))
+reglas2filtradas <- subset(reglas2ordenadas, confidence < 0.90)
+
+
+#para el tercer análisis se busca encontrar de que área son las jóvenes que abandonan el país previo a sus 18 años
+data3 <- data_migracion %>% filter(PEI4 < 18)
+data3 <- data3 %>% select(-c(MUNICIPIO, ZONA))
+colnames(data3)
+
+reglas3 <- fim4r(data3, method = "fpgrowth", target="rules", supp = .2, conf = .4)
+reglas3frame <- as(reglas3, "data.frame")
+reglas3ordenadas <- arrange(reglas3frame, desc(confidence))
+reglas3filtradas <- subset(reglas3ordenadas, confidence < 0.90)
+
+
+```
