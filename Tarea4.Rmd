@@ -54,9 +54,6 @@ centroides$cluster <- as.factor(1:nrow(centroides))
 #ver las medias de los clusters
 aggregate(. ~ cluster, data = data2_graph, mean)
 
-# Visualizar clusters en un gráfico de dispersión de los dos primeros componentes principales
-fviz_cluster(cluster, data = data2_graph)  # Estilo de la gráfica
-
 ggplot(data2_graph, aes(x = DEPARTAMENTO, y = PEI5, color = as.factor(cluster)))+
   geom_point(size = 2) +
   geom_point(data = centroides, aes(x=DEPARTAMENTO, y = PEI5), color ="red", size=4, shape=8)+
